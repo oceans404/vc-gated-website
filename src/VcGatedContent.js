@@ -1,8 +1,9 @@
-function VcGatedContent({ revokeAccess }) {
+import { Button } from "@chakra-ui/react";
+
+function VcGatedContent() {
   return (
-    <div>
+    <div className="Page">
       <>This is the super secret VC gated content!</>
-      <button onClick={() => revokeAccess()}>Revoke access</button>
     </div>
   );
 }
