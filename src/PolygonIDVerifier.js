@@ -10,21 +10,21 @@ import {
   Button,
   useDisclosure,
   Spinner,
+  Center,
 } from "@chakra-ui/react";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import QRCode from "react-qr-code";
 
 import { io } from "socket.io-client";
 
-const serverURL = "https://vc-birthday-server.onrender.com";
-const getQrCodeApi = (sessionId) =>
-  serverURL + `/api/get-auth-qr?sessionId=${sessionId}`;
-
-const socket = io(serverURL);
+const linkDownloadPolygonIDWalletApp =
+  "https://0xpolygonid.github.io/tutorials/wallet/wallet-overview/#quick-start";
 
 function PolygonIDVerifier({
   credentialType,
   issuerLink,
   onVerificationResult,
+  serverURL,
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [sessionId, setSessionId] = useState("");
@@ -35,11 +35,16 @@ function PolygonIDVerifier({
   const [verificationMessage, setVerfificationMessage] = useState("");
   const [socketEvents, setSocketEvents] = useState([]);
 
+  const getQrCodeApi = (sessionId) =>
+    serverURL + `/api/get-auth-qr?sessionId=${sessionId}`;
+
+  const socket = io(serverURL);
+
   useEffect(() => {
     socket.on("connect", () => {
       setSessionId(socket.id);
 
-      // emit this session's events only
+      // only watch this session's events
       socket.on(socket.id, (arg) => {
         setSocketEvents((socketEvents) => [...socketEvents, arg]);
       });
@@ -62,16 +67,15 @@ function PolygonIDVerifier({
   useEffect(() => {
     if (socketEvents.length) {
       const currentSocketEvent = socketEvents[socketEvents.length - 1];
-      console.log(currentSocketEvent);
 
-      if (currentSocketEvent.fn == "handleVerification") {
-        if (currentSocketEvent.status == "IN_PROGRESS") {
+      if (currentSocketEvent.fn === "handleVerification") {
+        if (currentSocketEvent.status === "IN_PROGRESS") {
           setIsHandlingVerification(true);
         } else {
           setIsHandlingVerification(false);
           setVerificationCheckComplete(true);
-          if (currentSocketEvent.status == "DONE") {
-            setVerfificationMessage("✅ Verified VC");
+          if (currentSocketEvent.status === "DONE") {
+            setVerfificationMessage("✅ Verified proof");
             setTimeout(() => {
               reportVerificationResult(true);
             }, "2000");
@@ -84,6 +88,7 @@ function PolygonIDVerifier({
     }
   }, [socketEvents]);
 
+  // callback, send verification result back to app
   const reportVerificationResult = (result) => {
     onVerificationResult(result);
   };
@@ -95,22 +100,44 @@ function PolygonIDVerifier({
 
   return (
     <div>
-      {/* <Button onClick={() => reportVerificationResult(true)}> */}
-      <Button onClick={onOpen}>Prove access rights</Button>
+      {sessionId ? (
+        <Button colorScheme="purple" onClick={onOpen} margin={4}>
+          Prove access rights
+        </Button>
+      ) : (
+        <Spinner />
+      )}
 
       {qrCodeData && (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={onClose} isCentered>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Prove access rights</ModalHeader>
+            <ModalHeader>
+              Scan this QR code from your{" "}
+              <a
+                href={linkDownloadPolygonIDWalletApp}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Polygon ID Wallet App
+              </a>{" "}
+              to prove access rights
+            </ModalHeader>
             <ModalCloseButton />
-            <ModalBody>
-              {isHandlingVerification && <Spinner />}
+            <ModalBody textAlign={"center"} fontSize={"12px"}>
+              {isHandlingVerification && (
+                <div>
+                  <p>Authenticating...</p>
+                  <Spinner size={"xl"} colorScheme="purple" my={2} />
+                </div>
+              )}
               {verificationMessage}
               {qrCodeData &&
                 !isHandlingVerification &&
                 !verificationCheckComplete && (
-                  <QRCode value={JSON.stringify(qrCodeData)} />
+                  <Center marginBottom={1}>
+                    <QRCode value={JSON.stringify(qrCodeData)} />
+                  </Center>
                 )}
 
               {qrCodeData.body?.scope[0].query && (
@@ -125,11 +152,22 @@ function PolygonIDVerifier({
             </ModalBody>
 
             <ModalFooter>
-              <Button colorScheme="blue" mr={3} onClick={onClose}>
-                Close
+              <Button
+                fontSize={"10px"}
+                margin={1}
+                colorScheme="purple"
+                onClick={() => openInNewTab(linkDownloadPolygonIDWalletApp)}
+              >
+                Download the Polygon ID Wallet App{" "}
+                <ExternalLinkIcon marginLeft={2} />
               </Button>
-              <Button variant="ghost" onClick={() => openInNewTab(issuerLink)}>
-                Get {credentialType} VC
+              <Button
+                fontSize={"10px"}
+                margin={1}
+                colorScheme="purple"
+                onClick={() => openInNewTab(issuerLink)}
+              >
+                Get a {credentialType} VC <ExternalLinkIcon marginLeft={2} />
               </Button>
             </ModalFooter>
           </ModalContent>
