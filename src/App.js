@@ -25,9 +25,9 @@ function App() {
                 <a href="https://0xpolygonid.github.io/tutorials/#core-concepts-of-polygon-id-verifiable-credentials-identity-holder-issuer-and-verifier-triangle-of-trust">
                   (Verifiable Credential)
                 </a>{" "}
-                gated website.
+                gated page.
               </p>
-              <h2>Prove you were born before 2023 to enter</h2>
+              <h2>Prove you were born before 2023 to view</h2>
 
               <PolygonIDVerifier
                 // server code: https://github.com/oceans404/vc-verifier
