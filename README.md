@@ -1,70 +1,63 @@
-# Getting Started with Create React App
+# This is a Verifiable Credential (VC) Gated Website
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+- Website: https://birthday-gated-website.on.fleek.co/
+- In order to see the gated part of the website, you need a [KYCAgeCredential Verifiable Credential](https://www.notion.so/oceans404/How-to-get-a-KYCAgeCredential-Verifiable-Credential-f3d34e7c98ec4147b6b2fae79066c4f6?pvs=4) with a birthday after January 1, 2023
 
-## Available Scripts
+<img width="1292" alt="Screenshot 2023-06-06 at 10 30 51 AM" src="https://github.com/oceans404/vc-gated-website/assets/91382964/53fe84f1-18ae-4050-9517-5e54ec1de982">
 
-In the project directory, you can run:
+## How to run locally
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+#### 0. Follow Verifier server setup instructions
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Read through the server readme and follow local server setup instructions: 
+https://github.com/oceans404/vc-verifier#local-server-setup
 
-### `npm test`
+#### 1. ⭐ Star this repo so you have it for future reference, then clone it and install dependencies
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+git clone https://github.com/oceans404/vc-gated-website
+cd vc-gated-website
+npm i
+```
 
-### `npm run build`
+#### 2. Create a .env file by copying my sample
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+cp .env.sample .env;
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Update the REACT_APP_VERIFICATION_SERVER_URL variable to your hosted server url from step 7: https://github.com/oceans404/vc-verifier#7-hosting-the-server-optional
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Or, if you haven't hosted the server using Render, set REACT_APP_VERIFICATION_SERVER_URL="http://localhost:3000" because that's where the you are running the server locally. Don't set REACT_APP_VERIFICATION_SERVER_URL to your ngrok forwarding address or you'll face CORS errors.
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+#### 3. Start the frontend
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+npm start
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Visit http://localhost:8080/
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-## Learn More
+#### 4. Optional: host your website using Fleek
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+I've documented a similar hosting process here: https://github.com/oceans404/fullstack-sockets-demo#deploy-your-frontend
 
-To learn React, check out the [React documentation](https://reactjs.org/).
 
-### Code Splitting
+## Logic flow
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This frontend interacts with my [verifier server](https://github.com/oceans404/vc-verifier) to
+- Watch for events emitted by socket for the user's specific sessionId
+  - frontend: https://github.com/oceans404/vc-gated-website/blob/main/src/PolygonIDVerifier.js#L48
+  - backend:   
+    - getAuthQr in progress https://github.com/oceans404/vc-verifier/blob/main/index.js#L63 
+    - getAuthQr done: https://github.com/oceans404/vc-verifier/blob/main/index.js#L86
+    - handleVerification in progress: https://github.com/oceans404/vc-verifier/blob/main/index.js#L100
+    - handleVerification done: https://github.com/oceans404/vc-verifier/blob/main/index.js#L135
+- Request the QR code containing the birthday query (zk request) for display
+  - frontend fetch: https://github.com/oceans404/vc-gated-website/blob/main/src/PolygonIDVerifier.js#L62
+  - backend getAuthQr: https://github.com/oceans404/vc-verifier/blob/main/index.js#L37
+  - backend birthday query: https://github.com/oceans404/vc-verifier/blob/main/proofRequest.js
+- Report verification result to the rest of the app: https://github.com/oceans404/vc-gated-website/blob/main/src/App.js#L39
