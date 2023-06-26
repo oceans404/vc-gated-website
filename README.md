@@ -1,5 +1,15 @@
 # This is a Verifiable Credential (VC) Gated Website
 
+
+The code below still works as of June 2023, but for the best developer experience, **use my fullstack template instead** - [fullstack-polygon-id-vc-gated-dapp](https://github.com/oceans404/fullstack-polygon-id-vc-gated-dapp) - It includes both the server and frontend and is everything you need to set up a KYCAgeCredential VC gated dapp with Polygon ID.
+
+
+-----
+
+## Deprecated repo
+
+(use above repo)
+
 - Website: https://birthday-gated-website.on.fleek.co/
 - In order to see the gated part of the website, you need a [KYCAgeCredential Verifiable Credential](https://www.notion.so/oceans404/How-to-get-a-KYCAgeCredential-Verifiable-Credential-f3d34e7c98ec4147b6b2fae79066c4f6?pvs=4) with a birthday after January 1, 2023, held in the Polygon ID Mobile wallet app.
 
